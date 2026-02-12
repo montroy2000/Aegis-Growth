@@ -41,73 +41,66 @@ jobs:
       - name: Install Solana CLI
         run: |
           sh -c "$(curl -sSfL https://release.solana.com/v1.18.26/install)"
-          export PATH="$HOME/.local/share/solana/install/active_release/bin:$PATH"
           echo "$HOME/.local/share/solana/install/active_release/bin" >> $GITHUB_PATH
+          echo "Solana installed to: $HOME/.local/share/solana/install/active_release/bin"
+          ls -la $HOME/.local/share/solana/install/active_release/bin/ || echo "Directory not found"
       
       - name: Verify Solana installation
         run: |
-          export PATH="$HOME/.local/share/solana/install/active_release/bin:$PATH"
-          solana --version
-          solana-keygen --version
+          which solana || echo "solana not in PATH"
+          $HOME/.local/share/solana/install/active_release/bin/solana --version
+          $HOME/.local/share/solana/install/active_release/bin/solana-keygen --version
       
       - name: Install Anchor CLI
         run: |
-          export PATH="$HOME/.local/share/solana/install/active_release/bin:$PATH"
           cargo install --git https://github.com/coral-xyz/anchor avm --locked --force
-          export PATH="$HOME/.cargo/bin:$PATH"
-          avm install 0.32.0
-          avm use 0.32.0
+          $HOME/.cargo/bin/avm install 0.32.0
+          $HOME/.cargo/bin/avm use 0.32.0
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
       
       - name: Verify Anchor installation
         run: |
-          export PATH="$HOME/.cargo/bin:$PATH"
-          anchor --version
+          $HOME/.cargo/bin/anchor --version
       
       - name: Setup deployer keypair
         env:
           DEPLOYER_KEYPAIR: ${{ secrets.DEPLOYER_KEYPAIR }}
         run: |
-          export PATH="$HOME/.local/share/solana/install/active_release/bin:$PATH"
           echo "$DEPLOYER_KEYPAIR" > deployer-keypair.json
-          solana config set --keypair deployer-keypair.json
-          solana config set --url ${{ github.event.inputs.network }}
+          $HOME/.local/share/solana/install/active_release/bin/solana config set --keypair deployer-keypair.json
+          $HOME/.local/share/solana/install/active_release/bin/solana config set --url ${{ github.event.inputs.network }}
       
       - name: Check deployer balance
         run: |
-          export PATH="$HOME/.local/share/solana/install/active_release/bin:$PATH"
-          BALANCE=$(solana balance | awk '{print $1}')
+          BALANCE=$($HOME/.local/share/solana/install/active_release/bin/solana balance | awk '{print $1}')
           echo "Deployer balance: $BALANCE SOL"
           if (( $(echo "$BALANCE < 2" | bc -l) )); then
             echo "⚠️  Warning: Low balance. You need at least 2 SOL for deployment."
-            echo "Deployer address: $(solana address)"
+            echo "Deployer address: $($HOME/.local/share/solana/install/active_release/bin/solana address)"
             exit 1
           fi
       
       - name: Build program
         run: |
-          export PATH="$HOME/.cargo/bin:$PATH"
           cd aegis-vault
-          anchor build
+          $HOME/.cargo/bin/anchor build
       
       - name: Get program ID
         id: program_id
         run: |
-          export PATH="$HOME/.local/share/solana/install/active_release/bin:$PATH"
-          PROGRAM_ID=$(solana address -k aegis-vault/target/deploy/aegis_vault-keypair.json)
+          PROGRAM_ID=$($HOME/.local/share/solana/install/active_release/bin/solana address -k aegis-vault/target/deploy/aegis_vault-keypair.json)
           echo "program_id=$PROGRAM_ID" >> $GITHUB_OUTPUT
           echo "Program ID: $PROGRAM_ID"
       
       - name: Deploy program
         run: |
-          export PATH="$HOME/.cargo/bin:$PATH"
           cd aegis-vault
-          anchor deploy --provider.cluster ${{ github.event.inputs.network }}
+          $HOME/.cargo/bin/anchor deploy --provider.cluster ${{ github.event.inputs.network }}
       
       - name: Verify deployment
         run: |
-          export PATH="$HOME/.local/share/solana/install/active_release/bin:$PATH"
           PROGRAM_ID="${{ steps.program_id.outputs.program_id }}"
-          solana program show $PROGRAM_ID
+          $HOME/.local/share/solana/install/active_release/bin/solana program show $PROGRAM_ID
       
       - name: Create deployment summary
         run: |
