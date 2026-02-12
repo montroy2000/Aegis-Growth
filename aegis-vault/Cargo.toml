@@ -9,6 +9,14 @@ overflow-checks = true
 lto = "fat"
 codegen-units = 1
 
+[patch.crates-io]
+blake3 = "=1.5.1"
+constant_time_eq = "=0.3.0"
+base64ct = "=1.6.0"
+der = "=0.7.8"
+spki = "=0.7.2"
+curve25519-dalek = "=4.1.0"
+
 [profile.release.build-override]
 opt-level = 3
 incremental = false
