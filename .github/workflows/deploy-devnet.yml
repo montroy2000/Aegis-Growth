@@ -41,32 +41,40 @@ jobs:
       - name: Install Solana CLI
         run: |
           sh -c "$(curl -sSfL https://release.solana.com/v1.18.26/install)"
+          export PATH="$HOME/.local/share/solana/install/active_release/bin:$PATH"
           echo "$HOME/.local/share/solana/install/active_release/bin" >> $GITHUB_PATH
       
       - name: Verify Solana installation
         run: |
+          export PATH="$HOME/.local/share/solana/install/active_release/bin:$PATH"
           solana --version
           solana-keygen --version
       
       - name: Install Anchor CLI
         run: |
+          export PATH="$HOME/.local/share/solana/install/active_release/bin:$PATH"
           cargo install --git https://github.com/coral-xyz/anchor avm --locked --force
+          export PATH="$HOME/.cargo/bin:$PATH"
           avm install 0.32.0
           avm use 0.32.0
       
       - name: Verify Anchor installation
-        run: anchor --version
+        run: |
+          export PATH="$HOME/.cargo/bin:$PATH"
+          anchor --version
       
       - name: Setup deployer keypair
         env:
           DEPLOYER_KEYPAIR: ${{ secrets.DEPLOYER_KEYPAIR }}
         run: |
+          export PATH="$HOME/.local/share/solana/install/active_release/bin:$PATH"
           echo "$DEPLOYER_KEYPAIR" > deployer-keypair.json
           solana config set --keypair deployer-keypair.json
           solana config set --url ${{ github.event.inputs.network }}
       
       - name: Check deployer balance
         run: |
+          export PATH="$HOME/.local/share/solana/install/active_release/bin:$PATH"
           BALANCE=$(solana balance | awk '{print $1}')
           echo "Deployer balance: $BALANCE SOL"
           if (( $(echo "$BALANCE < 2" | bc -l) )); then
@@ -77,23 +85,27 @@ jobs:
       
       - name: Build program
         run: |
+          export PATH="$HOME/.cargo/bin:$PATH"
           cd aegis-vault
           anchor build
       
       - name: Get program ID
         id: program_id
         run: |
-          PROGRAM_ID=$(solana address -k target/deploy/aegis_vault-keypair.json)
+          export PATH="$HOME/.local/share/solana/install/active_release/bin:$PATH"
+          PROGRAM_ID=$(solana address -k aegis-vault/target/deploy/aegis_vault-keypair.json)
           echo "program_id=$PROGRAM_ID" >> $GITHUB_OUTPUT
           echo "Program ID: $PROGRAM_ID"
       
       - name: Deploy program
         run: |
+          export PATH="$HOME/.cargo/bin:$PATH"
           cd aegis-vault
           anchor deploy --provider.cluster ${{ github.event.inputs.network }}
       
       - name: Verify deployment
         run: |
+          export PATH="$HOME/.local/share/solana/install/active_release/bin:$PATH"
           PROGRAM_ID="${{ steps.program_id.outputs.program_id }}"
           solana program show $PROGRAM_ID
       
