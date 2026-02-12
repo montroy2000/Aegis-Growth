@@ -1,0 +1,27 @@
+[features]
+seeds = []
+skip-lint = []
+cpi = ["no-entrypoint"]
+no-entrypoint = []
+no-idl = []
+no-log-ix-name = []
+idl-build = ["anchor-lang/idl-build"]
+
+[dependencies]
+anchor-lang = "0.32.0"
+anchor-spl = "0.32.0"
+pyth-sdk-solana = "0.10.0"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "aegis_vault"
+
+[package]
+name = "aegis-vault"
+version = "0.1.0"
+description = "Immutable delta-neutral yield optimizer on Solana"
+edition = "2021"
+
+[package.metadata.docs.rs]
+all-features = true
+rustdoc-args = ["--cfg", "docsrs"]

@@ -1,0 +1,65 @@
+# Dependencies
+node_modules/
+target/
+.anchor/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Keypairs (NEVER COMMIT THESE!)
+*.keypair.json
+deployer-keypair.json
+id.json
+keypair.json
+
+# Solana binaries and releases (too large for GitHub)
+solana-release/
+solana-release-*.tar.bz2
+*.tar.bz2
+solana-install-tmp/
+
+# Build artifacts
+*.so
+*.dylib
+*.dll
+*.exe
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+venv/
+ENV/
+
+# Anchor
+.anchor/
+test-ledger/
