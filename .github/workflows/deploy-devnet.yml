@@ -38,68 +38,64 @@ jobs:
             target/
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
       
-      - name: Install Solana CLI
-        run: |
-          curl -sSfL https://release.solana.com/v1.18.26/install | sh
-          export PATH="$HOME/.local/share/solana/install/active_release/bin:$PATH"
-          echo "$HOME/.local/share/solana/install/active_release/bin" >> $GITHUB_PATH
+      - name: Install Solana
+        uses: metadaoproject/setup-solana@v1
+        with:
+          solana-cli-version: '1.18.26'
       
       - name: Verify Solana installation
         run: |
-          ls -la $HOME/.local/share/solana/install/active_release/bin/
-          $HOME/.local/share/solana/install/active_release/bin/solana --version
-          $HOME/.local/share/solana/install/active_release/bin/solana-keygen --version
+          solana --version
+          solana-keygen --version
       
       - name: Install Anchor CLI
         run: |
           cargo install --git https://github.com/coral-xyz/anchor avm --locked --force
-          $HOME/.cargo/bin/avm install 0.32.0
-          $HOME/.cargo/bin/avm use 0.32.0
-          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+          avm install 0.32.0
+          avm use 0.32.0
       
       - name: Verify Anchor installation
-        run: |
-          $HOME/.cargo/bin/anchor --version
+        run: anchor --version
       
       - name: Setup deployer keypair
         env:
           DEPLOYER_KEYPAIR: ${{ secrets.DEPLOYER_KEYPAIR }}
         run: |
           echo "$DEPLOYER_KEYPAIR" > deployer-keypair.json
-          $HOME/.local/share/solana/install/active_release/bin/solana config set --keypair deployer-keypair.json
-          $HOME/.local/share/solana/install/active_release/bin/solana config set --url ${{ github.event.inputs.network }}
+          solana config set --keypair deployer-keypair.json
+          solana config set --url ${{ github.event.inputs.network }}
       
       - name: Check deployer balance
         run: |
-          BALANCE=$($HOME/.local/share/solana/install/active_release/bin/solana balance | awk '{print $1}')
+          BALANCE=$(solana balance | awk '{print $1}')
           echo "Deployer balance: $BALANCE SOL"
           if (( $(echo "$BALANCE < 2" | bc -l) )); then
             echo "⚠️  Warning: Low balance. You need at least 2 SOL for deployment."
-            echo "Deployer address: $($HOME/.local/share/solana/install/active_release/bin/solana address)"
+            echo "Deployer address: $(solana address)"
             exit 1
           fi
       
       - name: Build program
         run: |
           cd aegis-vault
-          $HOME/.cargo/bin/anchor build
+          anchor build
       
       - name: Get program ID
         id: program_id
         run: |
-          PROGRAM_ID=$($HOME/.local/share/solana/install/active_release/bin/solana address -k aegis-vault/target/deploy/aegis_vault-keypair.json)
+          PROGRAM_ID=$(solana address -k aegis-vault/target/deploy/aegis_vault-keypair.json)
           echo "program_id=$PROGRAM_ID" >> $GITHUB_OUTPUT
           echo "Program ID: $PROGRAM_ID"
       
       - name: Deploy program
         run: |
           cd aegis-vault
-          $HOME/.cargo/bin/anchor deploy --provider.cluster ${{ github.event.inputs.network }}
+          anchor deploy --provider.cluster ${{ github.event.inputs.network }}
       
       - name: Verify deployment
         run: |
           PROGRAM_ID="${{ steps.program_id.outputs.program_id }}"
-          $HOME/.local/share/solana/install/active_release/bin/solana program show $PROGRAM_ID
+          solana program show $PROGRAM_ID
       
       - name: Create deployment summary
         run: |
