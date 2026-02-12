@@ -40,14 +40,13 @@ jobs:
       
       - name: Install Solana CLI
         run: |
-          sh -c "$(curl -sSfL https://release.solana.com/v1.18.26/install)"
+          curl -sSfL https://release.solana.com/v1.18.26/install | sh
+          export PATH="$HOME/.local/share/solana/install/active_release/bin:$PATH"
           echo "$HOME/.local/share/solana/install/active_release/bin" >> $GITHUB_PATH
-          echo "Solana installed to: $HOME/.local/share/solana/install/active_release/bin"
-          ls -la $HOME/.local/share/solana/install/active_release/bin/ || echo "Directory not found"
       
       - name: Verify Solana installation
         run: |
-          which solana || echo "solana not in PATH"
+          ls -la $HOME/.local/share/solana/install/active_release/bin/
           $HOME/.local/share/solana/install/active_release/bin/solana --version
           $HOME/.local/share/solana/install/active_release/bin/solana-keygen --version
       
