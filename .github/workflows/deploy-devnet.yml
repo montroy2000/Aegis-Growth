@@ -109,6 +109,12 @@ jobs:
              exit 1
           fi
       
+      - name: Clean cached lockfile
+        run: |
+          # Remove any cached Cargo.lock to prevent version 4 format issues
+          rm -f aegis-vault/Cargo.lock
+          echo "Cleaned any cached Cargo.lock files"
+      
       - name: Build program
         run: |
           export PATH="$(pwd)/solana-release/bin:$PATH"
