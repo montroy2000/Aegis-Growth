@@ -114,7 +114,10 @@ jobs:
           # Ensure ONLY Rust 1.75.0 is in PATH
           export PATH="$HOME/.cargo/bin:$(pwd)/solana-release/bin:/usr/local/bin:/usr/bin:/bin"
           
-          # Force global default to 1.75.0 (in case anchor clears env vars)
+          # FORCE toolchain via environment variable (overrides everything)
+          export RUSTUP_TOOLCHAIN="1.75.0"
+          
+          # Force global default just in case
           rustup default 1.75.0
           rustup show
           
@@ -122,6 +125,9 @@ jobs:
           find . -name "Cargo.lock" -type f -print -delete
           
           cd aegis-vault
+          
+          # Debug: allow us to see if override file persists
+          ls -la
           
           # Pre-generate lockfile with confirmed 1.75.0 cargo
           echo "Generating lockfile with $(cargo --version)..."
