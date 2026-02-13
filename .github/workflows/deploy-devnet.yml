@@ -114,25 +114,20 @@ jobs:
           # Ensure ONLY Rust 1.75.0 is in PATH
           export PATH="$HOME/.cargo/bin:$(pwd)/solana-release/bin:/usr/local/bin:/usr/bin:/bin"
           
-          # Verify Cargo version
-          echo "Cargo version: $(cargo --version)"
-          echo "Rustc version: $(rustc --version)"
-          echo "Which cargo: $(which cargo)"
+          # Force global default to 1.75.0 (in case anchor clears env vars)
+          rustup default 1.75.0
+          rustup show
           
           # Clean ALL lockfiles recursively
           find . -name "Cargo.lock" -type f -print -delete
-          echo "Cleaned all Cargo.lock files"
-          
-          # Verify they are gone
-          if find . -name "Cargo.lock" -type f | grep -q .; then
-            echo "ERROR: Some Cargo.lock files still exist!"
-            find . -name "Cargo.lock" -type f
-            exit 1
-          fi
           
           cd aegis-vault
           
-          # Build with explicit cargo from our toolchain
+          # Pre-generate lockfile with confirmed 1.75.0 cargo
+          echo "Generating lockfile with $(cargo --version)..."
+          cargo generate-lockfile
+          
+          # Build
           anchor build
       
       - name: Get program ID
