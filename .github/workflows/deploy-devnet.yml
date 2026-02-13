@@ -119,13 +119,14 @@ jobs:
           echo "Rustc version: $(rustc --version)"
           echo "Which cargo: $(which cargo)"
           
-          # Clean lockfile immediately before build
-          rm -f aegis-vault/Cargo.lock
-          echo "Cleaned Cargo.lock"
+          # Clean ALL lockfiles recursively
+          find . -name "Cargo.lock" -type f -print -delete
+          echo "Cleaned all Cargo.lock files"
           
-          # Verify it's gone
-          if [ -f aegis-vault/Cargo.lock ]; then
-            echo "ERROR: Cargo.lock still exists!"
+          # Verify they are gone
+          if find . -name "Cargo.lock" -type f | grep -q .; then
+            echo "ERROR: Some Cargo.lock files still exist!"
+            find . -name "Cargo.lock" -type f
             exit 1
           fi
           
