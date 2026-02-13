@@ -113,7 +113,22 @@ jobs:
         run: |
           export PATH="$(pwd)/solana-release/bin:$PATH"
           cd aegis-vault
-          anchor deploy --provider.cluster ${{ github.event.inputs.network }}
+          
+          echo "📦 Starting deployment to ${{ github.event.inputs.network }}..."
+          echo "Program ID: $(solana address -k target/deploy/aegis_vault-keypair.json)"
+          echo "Deployer: $(solana address)"
+          echo "Balance: $(solana balance)"
+          
+          # Deploy with verbose output
+          if anchor deploy --provider.cluster ${{ github.event.inputs.network }} -v; then
+            echo "✅ Deployment command completed successfully"
+          else
+            echo "❌ Deployment command failed with exit code $?"
+            exit 1
+          fi
+          
+          # Wait for transaction confirmation
+          sleep 10
       
       - name: Verify deployment
         run: |
