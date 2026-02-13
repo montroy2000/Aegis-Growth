@@ -9,7 +9,7 @@ pub mod errors;
 
 use instructions::*;
 
-declare_id!("5R3w89qTN5S1hF6cep8mAnRJT79M5s7RCyokwd7NcDKW");
+declare_id!("3yGKkTBvmbJCYcgfmFK3Sn94zBt1SL48Q1dBn4v76jEt");
 
 #[program]
 pub mod aegis_vault {

@@ -6,7 +6,7 @@ resolution = true
 skip-lint = false
 
 [programs.devnet]
-aegis_vault = "5R3w89qTN5S1hF6cep8mAnRJT79M5s7RCyokwd7NcDKW"
+aegis_vault = "3yGKkTBvmbJCYcgfmFK3Sn94zBt1SL48Q1dBn4v76jEt"
 
 [programs.mainnet]
 aegis_vault = "AeGiSvAu1tXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
