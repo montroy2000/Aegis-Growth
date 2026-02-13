@@ -63,3 +63,4 @@ ENV/
 # Anchor
 .anchor/
 test-ledger/
+aegis-vault/Cargo.lock
