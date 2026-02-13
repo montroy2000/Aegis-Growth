@@ -69,25 +69,30 @@ jobs:
         run: |
           export PATH="$(pwd)/solana-release/bin:$PATH"
           
-          # Try to get balance, default to 0 if account not found
-          BALANCE=$(solana balance | awk '{print $1}' || echo "0")
-          echo "Current balance: $BALANCE SOL"
+          # Target balance: 4 SOL (deployment + buffer rent)
+          TARGET_BALANCE=4
+          MAX_RETRIES=3
           
-          # Compare floating point numbers
-          if (( $(echo "$BALANCE < 2" | bc -l) )); then
-            echo "Balance is low ($BALANCE SOL). Attempting airdrop..."
-            solana airdrop 2 || echo "Airdrop failed or rate limited"
+          for ((i=1; i<=MAX_RETRIES; i++)); do
+            BALANCE=$(solana balance | awk '{print $1}' || echo "0")
+            echo "Current balance: $BALANCE SOL"
             
-            # Check balance again
-            NEW_BALANCE=$(solana balance | awk '{print $1}')
-            echo "New balance: $NEW_BALANCE SOL"
-            
-            if (( $(echo "$NEW_BALANCE < 1" | bc -l) )); then
-              echo "❌ Error: Insufficient balance for deployment. Please fund $(solana address) manually."
-              exit 1
+            if (( $(echo "$BALANCE >= $TARGET_BALANCE" | bc -l) )); then
+              echo "✅ Balance is sufficient."
+              break
             fi
-          else
-             echo "✅ Balance is sufficient."
+            
+            echo "Attempt $i/$MAX_RETRIES: Requesting airdrop..."
+            solana airdrop 2 || echo "Airdrop rate limited, waiting..."
+            sleep 5
+          done
+          
+          FINAL_BALANCE=$(solana balance | awk '{print $1}' || echo "0")
+          if (( $(echo "$FINAL_BALANCE < 1.5" | bc -l) )); then
+             echo "❌ Error: Balance ($FINAL_BALANCE SOL) is likely too low for deployment."
+             echo "Please manually fund address: $(solana address)"
+             echo "Use https://faucet.solana.com/"
+             exit 1
           fi
       
       - name: Build program
