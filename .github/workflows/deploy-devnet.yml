@@ -52,15 +52,8 @@ jobs:
       
       - name: Install Anchor CLI
         run: |
+          npm install -g @coral-xyz/anchor-cli
           export PATH="$(pwd)/solana-release/bin:$PATH"
-          cargo install --git https://github.com/coral-xyz/anchor avm --locked --force
-          export PATH="$HOME/.cargo/bin:$PATH"
-          avm install 0.32.0
-          avm use 0.32.0
-      
-      - name: Verify Anchor installation
-        run: |
-          export PATH="$HOME/.cargo/bin:$PATH"
           anchor --version
       
       - name: Setup deployer keypair
@@ -85,7 +78,7 @@ jobs:
       
       - name: Build program
         run: |
-          export PATH="$HOME/.cargo/bin:$PATH"
+          export PATH="$(pwd)/solana-release/bin:$PATH"
           cd aegis-vault
           anchor build
       
@@ -99,7 +92,7 @@ jobs:
       
       - name: Deploy program
         run: |
-          export PATH="$HOME/.cargo/bin:$PATH"
+          export PATH="$(pwd)/solana-release/bin:$PATH"
           cd aegis-vault
           anchor deploy --provider.cluster ${{ github.event.inputs.network }}
       
