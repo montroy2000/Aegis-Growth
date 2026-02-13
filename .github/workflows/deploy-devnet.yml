@@ -65,15 +65,29 @@ jobs:
           solana config set --keypair deployer-keypair.json
           solana config set --url ${{ github.event.inputs.network }}
       
-      - name: Check deployer balance
+      - name: Check deployer balance and airdrop if needed
         run: |
           export PATH="$(pwd)/solana-release/bin:$PATH"
-          BALANCE=$(solana balance | awk '{print $1}')
-          echo "Deployer balance: $BALANCE SOL"
+          
+          # Try to get balance, default to 0 if account not found
+          BALANCE=$(solana balance | awk '{print $1}' || echo "0")
+          echo "Current balance: $BALANCE SOL"
+          
+          # Compare floating point numbers
           if (( $(echo "$BALANCE < 2" | bc -l) )); then
-            echo "⚠️  Warning: Low balance. You need at least 2 SOL for deployment."
-            echo "Deployer address: $(solana address)"
-            exit 1
+            echo "Balance is low ($BALANCE SOL). Attempting airdrop..."
+            solana airdrop 2 || echo "Airdrop failed or rate limited"
+            
+            # Check balance again
+            NEW_BALANCE=$(solana balance | awk '{print $1}')
+            echo "New balance: $NEW_BALANCE SOL"
+            
+            if (( $(echo "$NEW_BALANCE < 1" | bc -l) )); then
+              echo "❌ Error: Insufficient balance for deployment. Please fund $(solana address) manually."
+              exit 1
+            fi
+          else
+             echo "✅ Balance is sufficient."
           fi
       
       - name: Build program
