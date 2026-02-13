@@ -61,9 +61,23 @@ jobs:
           DEPLOYER_KEYPAIR: ${{ secrets.DEPLOYER_KEYPAIR }}
         run: |
           export PATH="$(pwd)/solana-release/bin:$PATH"
-          echo "$DEPLOYER_KEYPAIR" > deployer-keypair.json
-          solana config set --keypair deployer-keypair.json
+          
+          # Create keypair file with absolute path
+          KEYPAIR_PATH="$(pwd)/deployer-keypair.json"
+          echo "$DEPLOYER_KEYPAIR" > "$KEYPAIR_PATH"
+          chmod 600 "$KEYPAIR_PATH"
+          
+          # Configure solana CLI with absolute path
+          solana config set --keypair "$KEYPAIR_PATH"
           solana config set --url ${{ github.event.inputs.network }}
+          
+          # Export for anchor to use
+          echo "ANCHOR_WALLET=$KEYPAIR_PATH" >> $GITHUB_ENV
+          
+          # Verify configuration
+          echo "Keypair path: $KEYPAIR_PATH"
+          echo "Deployer address: $(solana address)"
+          echo "Network: $(solana config get | grep 'RPC URL')"
       
       - name: Check deployer balance and airdrop if needed
         run: |
@@ -118,14 +132,13 @@ jobs:
           echo "Program ID: $(solana address -k target/deploy/aegis_vault-keypair.json)"
           echo "Deployer: $(solana address)"
           echo "Balance: $(solana balance)"
+          echo "Anchor Wallet: $ANCHOR_WALLET"
           
-          # Deploy with verbose output
-          if anchor deploy --provider.cluster ${{ github.event.inputs.network }} -v; then
-            echo "✅ Deployment command completed successfully"
-          else
-            echo "❌ Deployment command failed with exit code $?"
-            exit 1
-          fi
+          # Deploy with explicit error handling
+          set -e  # Exit on any error
+          anchor deploy --provider.cluster ${{ github.event.inputs.network }}
+          
+          echo "✅ Deployment completed"
           
           # Wait for transaction confirmation
           sleep 10
