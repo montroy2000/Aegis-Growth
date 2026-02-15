@@ -5,11 +5,9 @@ members = [
 resolver = "2"
 [workspace.dependencies]
 # Strict pinning to force compatible versions across the entire workspace
-wit-bindgen = "=0.17.0"
 solana-program = "=1.18.26"
 solana-zk-token-sdk = "=1.18.26"
 spdx = "=0.10.6"
-wit-component = "=0.11.0"
 [profile.release]
 overflow-checks = true
 lto = "fat"
