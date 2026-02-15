@@ -12,10 +12,10 @@ anchor-lang = "0.30.1"
 anchor-spl = "0.30.1"
 pyth-sdk-solana = "0.10.0"
 # Strict pinning to match Solana 1.18.26 toolchain (Rust 1.75.0)
-solana-program = "=1.18.26"
-solana-zk-token-sdk = "=1.18.26"
+solana-program = { workspace = true }
+solana-zk-token-sdk = { workspace = true }
 # Conflict resolution for new crates requiring Rust > 1.75.0
-wit-bindgen = "=0.17.0" 
+wit-bindgen = { workspace = true } 
 
 # Pinning versions compatible with Rust 1.75.0 (Solana 1.18 toolchain)
 blake3 = "=1.5.1"
