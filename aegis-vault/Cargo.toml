@@ -8,6 +8,7 @@ resolver = "2"
 wit-bindgen = "=0.17.0"
 solana-program = "=1.18.26"
 solana-zk-token-sdk = "=1.18.26"
+spdx = "=0.10.6"
 [profile.release]
 overflow-checks = true
 lto = "fat"

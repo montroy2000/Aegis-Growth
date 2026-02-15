@@ -16,6 +16,7 @@ solana-program = { workspace = true }
 solana-zk-token-sdk = { workspace = true }
 # Conflict resolution for new crates requiring Rust > 1.75.0
 wit-bindgen = { workspace = true } 
+spdx = { workspace = true } 
 
 # Pinning versions compatible with Rust 1.75.0 (Solana 1.18 toolchain)
 blake3 = "=1.5.1"
