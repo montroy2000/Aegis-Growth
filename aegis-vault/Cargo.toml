@@ -7,6 +7,7 @@ resolver = "2"
 # Strict pinning to force compatible versions across the entire workspace
 solana-program = "=1.18.26"
 solana-zk-token-sdk = "=1.18.26"
+blake3 = "=1.5.1"
 [profile.release]
 overflow-checks = true
 lto = "fat"
