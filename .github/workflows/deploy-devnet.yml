@@ -109,37 +109,25 @@ jobs:
              exit 1
           fi
       
-      - name: Build program
+      - name: Setup Build Environment (Modern)
         run: |
-          # Ensure ONLY Rust 1.75.0 is in PATH
-          export PATH="$HOME/.cargo/bin:$(pwd)/solana-release/bin:/usr/local/bin:/usr/bin:/bin"
+          # Ensure Solana bins are in PATH
+          export PATH="/home/runner/.local/share/solana/install/active_release/bin:$PATH"
           
-          # FORCE toolchain via environment variable (overrides everything)
-          export RUSTUP_TOOLCHAIN="1.75.0"
+          # Clean build artifacts to ensure fresh build
+          rm -rf node_modules
+          rm -rf target
+          rm -rf programs/*/target
           
-          # Force global default just in case
-          rustup default 1.75.0
-          rustup show
-          
-          # Clean ALL lockfiles recursively
-          find . -name "Cargo.lock" -type f -print -delete
-          
+          # Standard Anchor Build (Uses local cargo, no lockfile tricks)
           cd aegis-vault
-          
-          # Debug: allow us to see if override file persists
-          ls -la
-          
-          # Pre-generate lockfile with confirmed 1.75.0 cargo
-          echo "Generating lockfile with $(cargo --version)..."
-          cargo generate-lockfile
-          
-          # Build
+          npm install
           anchor build
       
       - name: Get program ID
         id: program_id
         run: |
-          export PATH="$(pwd)/solana-release/bin:$PATH"
+          export PATH="/home/runner/.local/share/solana/install/active_release/bin:$PATH"
           PROGRAM_ID=$(solana address -k aegis-vault/target/deploy/aegis_vault-keypair.json)
           echo "program_id=$PROGRAM_ID" >> $GITHUB_OUTPUT
           echo "Program ID: $PROGRAM_ID"

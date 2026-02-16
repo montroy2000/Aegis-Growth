@@ -4,10 +4,7 @@ members = [
 ]
 resolver = "2"
 [workspace.dependencies]
-# Strict pinning to force compatible versions across the entire workspace
-solana-program = "=1.18.26"
-solana-zk-token-sdk = "=1.18.26"
-blake3 = "=1.5.1"
+# Modern dependency resolution (no pins needed for latest Anchor/Rust)
 [profile.release]
 overflow-checks = true
 lto = "fat"
