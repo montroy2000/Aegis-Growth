@@ -53,13 +53,17 @@ jobs:
       - name: Install Anchor CLI
         run: |
           # Force Rust Stable (override any cached config)
-          rustup default stable
-          rustc --version
           
+          # Download official binary release (fastest & most reliable)
+          wget https://github.com/coral-xyz/anchor/releases/download/v0.30.1/anchor-v0.30.1-x86_64-unknown-linux-gnu.tar.gz
+          tar -xvf anchor-v0.30.1-x86_64-unknown-linux-gnu.tar.gz
           
-          # Install anchor-cli directly from source (bypassing avm issues)
-          cargo install --git https://github.com/coral-xyz/anchor --tag v0.30.1 anchor-cli --locked --force
+          # Move binary to path
+          mkdir -p $HOME/.anchor/bin
+          mv anchor-v0.30.1-x86_64-unknown-linux-gnu/bin/anchor $HOME/.anchor/bin/anchor
           
+          # Add to PATH
+          export PATH="$HOME/.anchor/bin:$PATH"
           anchor --version
       
       - name: Setup deployer keypair
