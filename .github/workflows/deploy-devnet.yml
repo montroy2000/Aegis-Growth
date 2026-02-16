@@ -54,16 +54,21 @@ jobs:
         run: |
           # Force Rust Stable (override any cached config)
           
-          # Download official binary release (fastest & most reliable)
-          wget https://github.com/coral-xyz/anchor/releases/download/v0.30.1/anchor-v0.30.1-x86_64-unknown-linux-gnu.tar.gz
-          tar -xvf anchor-v0.30.1-x86_64-unknown-linux-gnu.tar.gz
+          # Manually build from source using System Rust (Stable)
+          # We clone and remove rust-toolchain.toml to prevent it from downgrading us to 1.79.0
+          git clone https://github.com/coral-xyz/anchor anchor-repo
+          cd anchor-repo
+          git checkout v0.30.1
+          rm -f rust-toolchain.toml
           
-          # Move binary to path
-          mkdir -p $HOME/.anchor/bin
-          mv anchor-v0.30.1-x86_64-unknown-linux-gnu/bin/anchor $HOME/.anchor/bin/anchor
+          # Install from local path (cli folder)
+          cargo install --path cli --locked --force
           
-          # Add to PATH
-          export PATH="$HOME/.anchor/bin:$PATH"
+          # Add cargo bin to path (if not already)
+          export PATH="$HOME/.cargo/bin:$PATH"
+          cd ..
+          rm -rf anchor-repo
+          
           anchor --version
       
       - name: Setup deployer keypair
