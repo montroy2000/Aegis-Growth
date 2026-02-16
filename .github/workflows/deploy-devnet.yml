@@ -52,8 +52,13 @@ jobs:
       
       - name: Install Anchor CLI
         run: |
-          npm install -g @coral-xyz/anchor-cli@0.29.0
-          export PATH="$(pwd)/solana-release/bin:$PATH"
+          # Install avm and anchor via official script
+          cargo install --git https://github.com/coral-xyz/anchor avm --locked --force
+          avm install 0.30.1
+          avm use 0.30.1
+          
+          # Add to PATH
+          export PATH="$HOME/.avm/bin:$PATH"
           anchor --version
       
       - name: Setup deployer keypair
