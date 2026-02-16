@@ -56,8 +56,8 @@ jobs:
           rustup default stable
           rustc --version
           
-          # Install avm from specific tag (stable)
-          cargo install --git https://github.com/coral-xyz/anchor avm --tag v0.30.1 --locked --force
+          # Install latest avm (requires Rust 1.82+, which we now have)
+          cargo install --git https://github.com/coral-xyz/anchor avm --locked --force
           
           # Install anchor via avm
           avm install 0.30.1
