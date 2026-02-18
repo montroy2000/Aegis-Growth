@@ -137,6 +137,12 @@ jobs:
           # Standard Anchor Build (Uses local cargo, no lockfile tricks)
           cd aegis-vault
           npm install
+          
+          # PINNING: Generate lockfile and downgrade deps incompatible with Solana Rust 1.75.0
+          # Solana CLI 1.18 uses Rust 1.75.0, but 'blake3' 1.8.3 needs edition2024 (Rust 1.85+)
+          cargo generate-lockfile
+          cargo update -p blake3 --precise 1.5.1
+          
           anchor build
       
       - name: Get program ID
