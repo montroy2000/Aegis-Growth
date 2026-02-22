@@ -1,5 +1,5 @@
 use anchor_lang::prelude::*;
-use switchboard_v2::AggregatorAccountData;
+use switchboard_solana::AggregatorAccountData;
 
 /// Fetch the current USDC price from Switchboard oracle
 pub fn get_switchboard_price(aggregator: &AccountInfo) -> Result<i64> {
