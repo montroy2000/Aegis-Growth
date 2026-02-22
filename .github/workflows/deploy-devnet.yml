@@ -51,13 +51,9 @@ jobs:
       
       - name: Install Anchor CLI
         run: |
-          git clone https://github.com/coral-xyz/anchor anchor-repo
-          cd anchor-repo
-          git checkout v0.30.1
-          cargo install --path cli --locked --force
-          export PATH="$HOME/.cargo/bin:$PATH"
-          cd ..
-          rm -rf anchor-repo
+          # Install from crates.io (no --locked so cargo resolves time >=0.3.31,
+          # which fixes a type-inference regression that breaks under Rust stable 1.85+)
+          cargo install anchor-cli --version 0.30.1 --force
           anchor --version
       
       - name: Setup deployer keypair
