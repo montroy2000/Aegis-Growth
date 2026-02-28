@@ -62,7 +62,7 @@ pub fn handler(ctx: Context<Withdraw>, shares: u64) -> Result<()> {
         .and_then(|v| v.checked_div(vault.total_shares as u128))
         .ok_or(ErrorCode::MathOverflow)? as u64;
     
-    require!(vault_usdc.amount >= usdc_amount, ErrorCode::InsufficientEquity);
+    require!(ctx.accounts.vault_usdc.amount >= usdc_amount, ErrorCode::InsufficientEquity);
     
     // Burn shares
     token::burn(
